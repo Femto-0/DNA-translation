@@ -1,1 +1,3 @@
 AUG Methionine
+UAA STOP
+UUA Leucine
