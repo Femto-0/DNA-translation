@@ -8,72 +8,50 @@ Date: Feb 19, 2025
  */
 
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Translation {
 
-/*
-need to change the method such that:
-1. read an array that holds all the value for codons and their corresponding amino acid.
-2. Find the correct codon by using a for loop (or maybe something even better).
-3. Return the Amino acid
- */
-    public String findAminoAcid(String codon){
-        String aminoAcid= " ";
-        char firstNucleotide;
-        char secondNucleotide;
-        char thirdNucleotide;
-
-        HashMap<Character, HashMap<Character, HashMap<Character, String>>> firstNucleotideToSecond = linkNucleotides();
-        System.out.println(firstNucleotideToSecond);
-        if(codon.length()==3){
-            firstNucleotide=codon.charAt(0);
-            secondNucleotide=codon.charAt(1);
-            thirdNucleotide=codon.charAt(2);
-            if(firstNucleotideToSecond.containsKey(firstNucleotide)){
-                HashMap<Character, HashMap< Character, String> > secondMap= firstNucleotideToSecond.get(firstNucleotide);
-                if(secondMap.containsKey(secondNucleotide)){
-                    HashMap<Character, String> thirdMap= secondMap.get(secondNucleotide);
-                    if(thirdMap.containsKey(thirdNucleotide)){
-                        aminoAcid= thirdMap.get(thirdNucleotide);
-                    }
-                }
-            }
-        }else{
-            return "Invalid Codon";
+    public HashMap<String , String> populateHashMap(String filePath) throws IOException {
+        HashMap<String, String> codonToAminoAcid= new HashMap<>();
+        BufferedReader br= new BufferedReader(new FileReader(filePath));
+        String line;
+        while((line= br.readLine())!=null){
+            String[] arr = line.split(" ");
+            codonToAminoAcid.put(arr[0], arr[1]);
         }
+        br.close();
 
+        return codonToAminoAcid;
+    }
 
+    public boolean isValid(String codon){
 
+        return true;
+    }
 
-        return aminoAcid;
+    public String findAminoAcid(String codon) throws IOException {
+        if (codon.length() == 3 & isValid(codon)) {
+            String filePath = "src/codonToAminoAcid.txt";
+            HashMap<String, String> storedValues;
+            storedValues= populateHashMap(filePath);
+            return storedValues.get(codon);
+        } else{
+            return "Invalid codon";
+         }
     }
 
 
-    /*
-    need to change this method such that:
-     1. We can populate the HashMap using a BufferReader and store all the HashMaps in an array
-     2. Change the method such that the array storing HashMaps is returned.
-     */
-    private static HashMap<Character, HashMap<Character, HashMap<Character, String>>> linkNucleotides() {
-        HashMap<Character, String> lastNucleotideToAmino = new HashMap<>();
-        HashMap<Character, HashMap< Character, String> >secondNucleotideToLast= new HashMap<>();
-        HashMap<Character,HashMap<Character, HashMap<Character, String>> > firstNucleotideToSecond= new HashMap<>();
-        ArrayList<HashMap<Character,HashMap<Character, HashMap<Character, String>>>> arrStoreHashMaps= new ArrayList<>();
-
-        firstNucleotideToSecond.put('A', secondNucleotideToLast);
-        secondNucleotideToLast.put('U', lastNucleotideToAmino);
-        lastNucleotideToAmino.put('G', "Methionine");
-        arrStoreHashMaps.add(firstNucleotideToSecond);
-        return firstNucleotideToSecond;
-    }
 
 
-    public static void main(String[] args) {
-        System.out.println("test");
-        Translation t= new Translation();
-       System.out.println( t.findAminoAcid("AUG"));
+    public static void main(String[] args) throws IOException {
+        Translation t = new Translation();
+        System.out.println(t.findAminoAcid("AUG"));
     }
 
 }
