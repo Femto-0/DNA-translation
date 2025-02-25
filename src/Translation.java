@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Translation {
 
@@ -27,6 +28,7 @@ public class Translation {
             }
         } catch (FileNotFoundException fife) {
             System.out.println(fife.getMessage());
+            return null;
         }
         return codonToAminoAcid;
     }
@@ -56,28 +58,30 @@ public class Translation {
     public ArrayList<String> aminoAcidChain(String sequence) throws IOException {
         String filePath = "src/codonToAminoAcid.txt";
         HashMap<String, String> storedValues= populateHashMap(filePath);
+        if (storedValues != null) {
+            ArrayList<String> protein = new ArrayList<>();
+            int startFrom = findStartingCodon(sequence);
+            int stopAt = findStopCodon(sequence);
 
-        ArrayList<String> protein = new ArrayList<>();
-
-        int startFrom=findStartingCodon(sequence);
-        int stopAt=findStopCodon(sequence);
-
-        if(startFrom!=-1 && stopAt!=-1){
-            for(int i=startFrom; i<=stopAt-3; i+=3){
-                String codon= sequence.substring(i, i+3);
-                if(isValid(codon)){
-                    String aminoAcid = storedValues.get(codon);
-                    protein.add(aminoAcid);
-                }else {
-                    protein.add("invalidCodon");
+            if (startFrom != -1 && stopAt != -1) {
+                for (int i = startFrom; i <= stopAt - 3; i += 3) {
+                    String codon = sequence.substring(i, i + 3);
+                    if (isValid(codon)) {
+                        String aminoAcid = storedValues.get(codon);
+                        protein.add(aminoAcid);
+                    } else {
+                        protein.add("invalidCodon");
+                    }
                 }
+                protein.add("STOP");
+            } else {
+                System.out.println("Start or end codon not found " + startFrom + " " + stopAt);
+                System.exit(0);
             }
-            protein.add("STOP");
+            return protein;
         }else{
-            System.out.println("Start or end codon not found "+ startFrom +" "+ stopAt);
-            System.exit(0);
+             return new ArrayList<>();
         }
-        return protein;
     }
 
 
