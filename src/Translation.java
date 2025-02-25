@@ -14,39 +14,26 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class Translation {
 
     public HashMap<String , String> populateHashMap(String filePath) throws IOException {
         HashMap<String, String> codonToAminoAcid= new HashMap<>();
-        BufferedReader br= new BufferedReader(new FileReader(filePath));
-        String line;
-        while((line= br.readLine())!=null){
-            String[] arr = line.split(" ");
-            codonToAminoAcid.put(arr[0], arr[1]);
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] arr = line.split(" ");
+                codonToAminoAcid.put(arr[0], arr[1]);
+            }
+        } catch (FileNotFoundException fife) {
+            System.out.println(fife.getMessage());
         }
-        br.close();
-
         return codonToAminoAcid;
     }
 
     public boolean isValid(String codon){
-
-        return true;
+        return codon.length() == 3;
     }
-
-    public String findAminoAcid(String codon) throws IOException {
-        if (codon.length() == 3 & isValid(codon)) {
-            String filePath = "src/codonToAminoAcid.txt";
-            HashMap<String, String> storedValues;
-            storedValues= populateHashMap(filePath);
-            return storedValues.get(codon);
-        } else{
-            return "Invalid codon";
-         }
-    }
-
     public int findStartingCodon(String sequence){
         for(int i=0; i<sequence.length()-1; i++){
             if(sequence.substring(i, i+3).equals("AUG")){ //begin--> inclusive end-->exclusive
@@ -67,14 +54,23 @@ public class Translation {
 
 
     public ArrayList<String> aminoAcidChain(String sequence) throws IOException {
+        String filePath = "src/codonToAminoAcid.txt";
+        HashMap<String, String> storedValues= populateHashMap(filePath);
+
         ArrayList<String> protein = new ArrayList<>();
+
         int startFrom=findStartingCodon(sequence);
         int stopAt=findStopCodon(sequence);
+
         if(startFrom!=-1 && stopAt!=-1){
             for(int i=startFrom; i<=stopAt-3; i+=3){
                 String codon= sequence.substring(i, i+3);
-                String aminoAcid=findAminoAcid(codon);
-                protein.add(aminoAcid);
+                if(isValid(codon)){
+                    String aminoAcid = storedValues.get(codon);
+                    protein.add(aminoAcid);
+                }else {
+                    protein.add("invalidCodon");
+                }
             }
             protein.add("STOP");
         }else{
