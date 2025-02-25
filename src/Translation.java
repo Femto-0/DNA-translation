@@ -56,14 +56,13 @@ public class Translation {
         return -1;
     }
     public int findStopCodon(String sequence){
-        String correctFormatForSequence= sequence+" "; //had to do this because the way substrings are formed in Java don't support how I want this method to act.
-        for(int i = correctFormatForSequence.length()-1; true; i--){
-            if(correctFormatForSequence.substring(i-2, i+1).equals("UAA")){ //begin--> inclusive end-->exclusive
+        String correctFormatForSequence= sequence+" "; //had to do this because the way substrings are formed in Java doesn't support how I want this method to act.
+        for(int i = correctFormatForSequence.length()-1; i>=2; i--){
+            if(correctFormatForSequence.substring(i-2, i+1).equals("UGA")){ //begin--> inclusive end-->exclusive
                 return i-2;
-            }else{
-                return -1;
             }
         }
+        return -1;
     }
 
 
@@ -79,7 +78,7 @@ public class Translation {
             }
             protein.add("STOP");
         }else{
-            System.out.println("Start or end codon not found");
+            System.out.println("Start or end codon not found "+ startFrom +" "+ stopAt);
             System.exit(0);
         }
         return protein;
@@ -90,7 +89,7 @@ public class Translation {
 
     public static void main(String[] args) throws IOException {
         Translation t = new Translation();
-        String sequence= "AUGUUAUA";
+        String sequence= "AUGGCUAAGUUCCCGUGA";
         System.out.println(t.aminoAcidChain(sequence));
     }
 
